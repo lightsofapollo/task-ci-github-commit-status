@@ -1,11 +1,15 @@
 suite('verify_pr', function() {
   var verify = require('../lib/verify_pr'),
-      github = require('../lib/github');
+      githubFactory = require('../lib/github');
 
   var STATES = require('../lib/error_states');
 
+  var github;
   setup(function() {
     this.sinon = sinon.sandbox.create();
+
+    github = githubFactory.create();
+    this.sinon.stub(githubFactory, 'create').returns(github);
   });
 
   teardown(function() {
@@ -16,7 +20,7 @@ suite('verify_pr', function() {
     var base = {
       mergeable: true,
       state: 'open',
-      base: {
+      head: {
         sha: 'myshaisbetterthenyoursha'
       }
     };
@@ -72,7 +76,7 @@ suite('verify_pr', function() {
         // status check
         assert.calledWithMatch(
           status,
-          sinon.match({ user: user, repo: repo, sha: pr.base.sha }),
+          sinon.match({ user: user, repo: repo, sha: pr.head.sha }),
           sinon.match.any
         );
 
@@ -124,7 +128,7 @@ suite('verify_pr', function() {
         // status check
         assert.calledWithMatch(
           status,
-          sinon.match({ user: user, repo: repo, sha: pr.base.sha }),
+          sinon.match({ user: user, repo: repo, sha: pr.head.sha }),
           sinon.match.any
         );
 
@@ -228,7 +232,7 @@ suite('verify_pr', function() {
         // status check
         assert.calledWithMatch(
           status,
-          sinon.match({ user: user, repo: repo, sha: pr.base.sha }),
+          sinon.match({ user: user, repo: repo, sha: pr.head.sha }),
           sinon.match.any
         );
 
@@ -273,7 +277,7 @@ suite('verify_pr', function() {
         // status check
         assert.calledWithMatch(
           status,
-          sinon.match({ user: user, repo: repo, sha: pr.base.sha }),
+          sinon.match({ user: user, repo: repo, sha: pr.head.sha }),
           sinon.match.any
         );
 
@@ -318,7 +322,7 @@ suite('verify_pr', function() {
         // status check
         assert.calledWithMatch(
           status,
-          sinon.match({ user: user, repo: repo, sha: pr.base.sha }),
+          sinon.match({ user: user, repo: repo, sha: pr.head.sha }),
           sinon.match.any
         );
 

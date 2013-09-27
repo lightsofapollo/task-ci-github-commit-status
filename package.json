@@ -4,19 +4,24 @@
   "description": "task-ci-github-commit-status ============================",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "make"
+  },
+  "bin": {
+    "github-pull-status": "./bin/github-pull-status"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/lightsofapollo/task-ci-github-commit-status.git"
+    "url": "git://github.com/mozilla-b2g/task-ci-github-commit-status.git"
   },
   "author": "",
-  "license": "BSD-2-Clause",
+  "license": "Apache2",
   "bugs": {
-    "url": "https://github.com/lightsofapollo/task-ci-github-commit-status/issues"
+    "url": "https://github.com/mozilla-b2g/task-ci-github-commit-status/issues"
   },
   "dependencies": {
-    "github": "~0.1.10"
+    "github": "~0.1.10",
+    "debug": "~0.7.2",
+    "commander": "~2.0.0"
   },
   "devDependencies": {
     "mocha": "~1.13.0",
