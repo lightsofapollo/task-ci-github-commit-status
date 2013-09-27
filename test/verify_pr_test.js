@@ -41,7 +41,8 @@ suite('verify_pr', function() {
 
   var user = 'james',
       repo = 'gaia',
-      prNumber = 3333;
+      prNumber = 3333,
+      oauthToken = 'abcoauthoyey';
 
   test('success', function(done) {
     // input of operation
@@ -84,6 +85,59 @@ suite('verify_pr', function() {
         done();
       }
     );
+  });
+
+  test('success + oauth', function(done) {
+    // input of operation
+    var input = { user: user, repo: repo, number: prNumber };
+
+    // stub predefined output
+    var pr = pullRequest(),
+        statusList = pullRequestStatus(['fail', 'success']);
+
+    // pull request get success
+    var get = this.sinon.stub(github.pullRequests, 'get');
+    get.callsArgWithAsync(1, null, pr);
+
+    // verify token is set
+    var auth = this.sinon.stub(github, 'authenticate');
+
+    // status request success
+    var status = this.sinon.stub(github.statuses, 'get');
+    status.callsArgWithAsync(1, null, statusList);
+
+    verify(
+      { user: user, repo: repo, number: prNumber, oauthToken: oauthToken },
+      function(err, result) {
+        // calls authenticate
+        assert.calledWithMatch(
+          auth,
+          sinon.match({ type: 'oauth', token: oauthToken })
+        );
+
+        // calls get
+        assert.calledWithMatch(get, sinon.match(input), sinon.match.any);
+
+        // get pr is before status check
+        assert(get.calledBefore(status), 'gets before status');
+
+        // status check
+        assert.calledWithMatch(
+          status,
+          sinon.match({ user: user, repo: repo, sha: pr.base.sha }),
+          sinon.match.any
+        );
+
+        // result of successful operation
+        assert.ok(!err, 'there is no err');
+        assert.deepEqual(result, {
+          success: true
+        });
+
+        done();
+      }
+    );
+
   });
 
   test('not mergeable', function(done) {
