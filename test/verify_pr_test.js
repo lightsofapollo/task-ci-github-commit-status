@@ -236,4 +236,50 @@ suite('verify_pr', function() {
     );
   });
 
+  test('status: pending', function(done) {
+    // input of operation
+    var input = { user: user, repo: repo, number: prNumber };
+
+    // stub predefined output
+    var pr = pullRequest(),
+        statusList = pullRequestStatus(['pending']);
+
+    // pull request get success
+    var get = this.sinon.stub(github.pullRequests, 'get');
+    get.callsArgWithAsync(1, null, pr);
+
+    // status request success
+    var status = this.sinon.stub(github.statuses, 'get');
+    status.callsArgWithAsync(1, null, statusList);
+
+    verify(
+      { user: user, repo: repo, number: prNumber },
+      function(err, result) {
+        // calls get
+        assert.calledWithMatch(get, sinon.match(input), sinon.match.any);
+
+        // get pr is before status check
+        assert(get.calledBefore(status), 'gets before status');
+
+        // status check
+        assert.calledWithMatch(
+          status,
+          sinon.match({ user: user, repo: repo, sha: pr.base.sha }),
+          sinon.match.any
+        );
+
+        // result of successful operation
+        assert.ok(!err, 'there is no err');
+        assert.deepEqual(result, {
+          success: false,
+          state: STATES.PENDING.state,
+          message: STATES.PENDING.message
+        });
+
+        done();
+      }
+    );
+  });
+
+
 });
