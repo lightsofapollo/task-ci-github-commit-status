@@ -1,0 +1,25 @@
+{
+  "name": "task-ci-github-commit-status",
+  "version": "0.0.0",
+  "description": "task-ci-github-commit-status ============================",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lightsofapollo/task-ci-github-commit-status.git"
+  },
+  "author": "",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/lightsofapollo/task-ci-github-commit-status/issues"
+  },
+  "dependencies": {
+    "github": "~0.1.10"
+  },
+  "devDependencies": {
+    "mocha": "~1.13.0",
+    "sinon": "~1.7.3"
+  }
+}
