@@ -339,5 +339,30 @@ suite('verify_pr', function() {
     );
   });
 
+  test('failure: pr not found', function(done) {
+    // input of operation
+    var input = { user: user, repo: repo, number: prNumber };
+
+    // pull request invalid pr
+    var get = this.sinon.stub(github.pullRequests, 'get');
+    get.callsArgWithAsync(1, { code: 404 });
+
+    verify(
+      { user: user, repo: repo, number: prNumber },
+      function(err, result) {
+        // calls get
+        assert.calledWithMatch(get, sinon.match(input), sinon.match.any);
+
+        assert.ok(!err, 'there is no err');
+        assert.deepEqual(result, {
+          success: false,
+          state: STATES.INVALID_PR.state,
+          message: STATES.INVALID_PR.message
+        });
+
+        done();
+      }
+    );
+  });
 
 });
