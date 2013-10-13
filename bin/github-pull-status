@@ -1,0 +1,44 @@
+#! /usr/bin/env node
+
+var program = require('commander');
+
+program.
+  usage('[options] <user/repo> <pull request #>').
+  option('--token [value]', 'github authentication token').
+  parse(process.argv);
+
+
+var task = require('../index');
+var options = {};
+
+if (program.args.length < 2) {
+  console.error('  must pass both user/repo and pull request #');
+  program.outputHelp();
+  process.exit(1);
+}
+
+// get user from args
+var repoPair = program.args[0].split('/');
+
+var options = {
+  user: repoPair[0],
+  repo: repoPair[1],
+  oauthToken: program.token,
+  number: parseInt(program.args[1], 10)
+};
+
+task(options, function(err, status) {
+  if (err) throw err;
+
+  if (status.success) {
+    console.log('success pull request #%s is safe to merge', options.number)
+    return;
+  }
+
+  console.error(
+    'pull request #%s is not safe to merge: %s',
+    options.number,
+    status.message
+  );
+  process.exit(1);
+});
