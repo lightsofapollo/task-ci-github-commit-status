@@ -2,7 +2,7 @@ suite('verify_pr', function() {
   var verify = require('../lib/verify_pr'),
       githubFactory = require('../lib/github');
 
-  var STATES = require('../lib/error_states');
+  var STATES = require('../lib/states');
 
   var github;
   setup(function() {
@@ -82,9 +82,7 @@ suite('verify_pr', function() {
 
         // result of successful operation
         assert.ok(!err, 'there is no err');
-        assert.deepEqual(result, {
-          success: true
-        });
+        assert.deepEqual(result, true);
 
         done();
       }
@@ -134,9 +132,7 @@ suite('verify_pr', function() {
 
         // result of successful operation
         assert.ok(!err, 'there is no err');
-        assert.deepEqual(result, {
-          success: true
-        });
+        assert.deepEqual(result, true);
 
         done();
       }
@@ -157,18 +153,14 @@ suite('verify_pr', function() {
 
     verify(
       { user: user, repo: repo, number: prNumber },
-      function(err, result) {
+      function(err, result, status) {
         // calls get
         assert.calledWithMatch(get, sinon.match(input), sinon.match.any);
 
         // result of successful operation
         assert.ok(!err, 'there is no err');
-        assert.deepEqual(result, {
-          success: false,
-          state: STATES.CANNOT_MERGE.state,
-          message: STATES.CANNOT_MERGE.message
-        });
-
+        assert.equal(result, false, 'failed task');
+        assert.deepEqual(status, STATES.CANNOT_MERGE);
         done();
       }
     );
@@ -187,18 +179,14 @@ suite('verify_pr', function() {
 
     verify(
       { user: user, repo: repo, number: prNumber },
-      function(err, result) {
+      function(err, result, status) {
         // calls get
         assert.calledWithMatch(get, sinon.match(input), sinon.match.any);
 
         // result of successful operation
         assert.ok(!err, 'there is no err');
-        assert.deepEqual(result, {
-          success: false,
-          state: STATES.CLOSED.state,
-          message: STATES.CLOSED.message
-        });
-
+        assert.equal(result, false, 'task failed');
+        assert.equal(status, STATES.CLOSED);
         done();
       }
     );
@@ -217,12 +205,12 @@ suite('verify_pr', function() {
     get.callsArgWithAsync(1, null, pr);
 
     // status request success
-    var status = this.sinon.stub(github.statuses, 'get');
-    status.callsArgWithAsync(1, null, statusList);
+    var ciStatus = this.sinon.stub(github.statuses, 'get');
+    ciStatus.callsArgWithAsync(1, null, statusList);
 
     verify(
       { user: user, repo: repo, number: prNumber },
-      function(err, result) {
+      function(err, result, status) {
         // calls get
         assert.calledWithMatch(get, sinon.match(input), sinon.match.any);
 
@@ -231,19 +219,15 @@ suite('verify_pr', function() {
 
         // status check
         assert.calledWithMatch(
-          status,
+          ciStatus,
           sinon.match({ user: user, repo: repo, sha: pr.head.sha }),
           sinon.match.any
         );
 
         // result of successful operation
         assert.ok(!err, 'there is no err');
-        assert.deepEqual(result, {
-          success: false,
-          state: STATES.CI_NO_STATUS.state,
-          message: STATES.CI_NO_STATUS.message
-        });
-
+        assert.equal(result, false, 'failed task');
+        assert.deepEqual(status, STATES.CI_NO_STATUS);
         done();
       }
     );
@@ -262,12 +246,12 @@ suite('verify_pr', function() {
     get.callsArgWithAsync(1, null, pr);
 
     // status request success
-    var status = this.sinon.stub(github.statuses, 'get');
-    status.callsArgWithAsync(1, null, statusList);
+    var ciStatus = this.sinon.stub(github.statuses, 'get');
+    ciStatus.callsArgWithAsync(1, null, statusList);
 
     verify(
       { user: user, repo: repo, number: prNumber },
-      function(err, result) {
+      function(err, result, status) {
         // calls get
         assert.calledWithMatch(get, sinon.match(input), sinon.match.any);
 
@@ -276,19 +260,15 @@ suite('verify_pr', function() {
 
         // status check
         assert.calledWithMatch(
-          status,
+          ciStatus,
           sinon.match({ user: user, repo: repo, sha: pr.head.sha }),
           sinon.match.any
         );
 
         // result of successful operation
         assert.ok(!err, 'there is no err');
-        assert.deepEqual(result, {
-          success: false,
-          state: STATES.CI_FAIL.state,
-          message: STATES.CI_FAIL.message
-        });
-
+        assert.equal(result, false, 'task failed');
+        assert.deepEqual(status, STATES.CI_FAIL);
         done();
       }
     );
@@ -307,33 +287,29 @@ suite('verify_pr', function() {
     get.callsArgWithAsync(1, null, pr);
 
     // status request success
-    var status = this.sinon.stub(github.statuses, 'get');
-    status.callsArgWithAsync(1, null, statusList);
+    var ciStatus = this.sinon.stub(github.statuses, 'get');
+    ciStatus.callsArgWithAsync(1, null, statusList);
 
     verify(
       { user: user, repo: repo, number: prNumber },
-      function(err, result) {
+      function(err, result, status) {
         // calls get
         assert.calledWithMatch(get, sinon.match(input), sinon.match.any);
 
         // get pr is before status check
-        assert(get.calledBefore(status), 'gets before status');
+        assert(get.calledBefore(ciStatus), 'gets before status');
 
         // status check
         assert.calledWithMatch(
-          status,
+          ciStatus,
           sinon.match({ user: user, repo: repo, sha: pr.head.sha }),
           sinon.match.any
         );
 
         // result of successful operation
         assert.ok(!err, 'there is no err');
-        assert.deepEqual(result, {
-          success: false,
-          state: STATES.PENDING.state,
-          message: STATES.PENDING.message
-        });
-
+        assert.equal(result, false, 'task fail');
+        assert.deepEqual(status, STATES.PENDING);
         done();
       }
     );
@@ -349,17 +325,13 @@ suite('verify_pr', function() {
 
     verify(
       { user: user, repo: repo, number: prNumber },
-      function(err, result) {
+      function(err, result, status) {
         // calls get
         assert.calledWithMatch(get, sinon.match(input), sinon.match.any);
 
         assert.ok(!err, 'there is no err');
-        assert.deepEqual(result, {
-          success: false,
-          state: STATES.INVALID_PR.state,
-          message: STATES.INVALID_PR.message
-        });
-
+        assert.equal(result, false, 'task failed');
+        assert.deepEqual(status, STATES.INVALID_PR);
         done();
       }
     );

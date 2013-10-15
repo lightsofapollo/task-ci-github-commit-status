@@ -8,7 +8,7 @@ program.
   parse(process.argv);
 
 
-var task = require('../index');
+var task = require('../');
 var options = {};
 
 if (program.args.length < 2) {
@@ -27,10 +27,10 @@ var options = {
   number: parseInt(program.args[1], 10)
 };
 
-task(options, function(err, status) {
+task(options, function(err, success, status) {
   if (err) throw err;
 
-  if (status.success) {
+  if (success) {
     console.log('success pull request #%s is safe to merge', options.number)
     return;
   }

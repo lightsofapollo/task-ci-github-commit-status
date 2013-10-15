@@ -2,7 +2,7 @@
   "name": "task-ci-github-commit-status",
   "version": "0.0.0",
   "description": "task-ci-github-commit-status ============================",
-  "main": "index.js",
+  "main": "lib/verify_pr.js",
   "scripts": {
     "test": "make"
   },
