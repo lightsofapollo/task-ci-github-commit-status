@@ -54,7 +54,7 @@ suite('verify_pr', function() {
 
     // stub predefined output
     var pr = pullRequest(),
-        statusList = pullRequestStatus(['fail', 'success']);
+        statusList = pullRequestStatus(['success', 'fail']);
 
     // pull request get success
     var get = this.sinon.stub(github.pullRequests, 'get');
@@ -95,7 +95,7 @@ suite('verify_pr', function() {
 
     // stub predefined output
     var pr = pullRequest(),
-        statusList = pullRequestStatus(['fail', 'success']);
+        statusList = pullRequestStatus(['success', 'fail']);
 
     // pull request get success
     var get = this.sinon.stub(github.pullRequests, 'get');
