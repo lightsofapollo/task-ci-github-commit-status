@@ -21,12 +21,9 @@ task(
     oauthToken: 'githuboauthtoken', /* optional */
     number: 1222, /* pull request number */
   },
-  function(err, result) {
-    // result in the success case
-    // => { success: true }
-
-    // any of the failure cases
-    // => { success: false, state: 'ci_pending', message: '...' }
+  function(err, success, status) {
+    // any case where success !== true
+    // status => { state: 'ci_pending', message: '...' }
   }
 );
 
